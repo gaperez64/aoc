@@ -32,26 +32,25 @@ def gold(fname):
         for line in f:
             line = line.strip()
             seqs.append(line)
+    s = "".join(seqs)
 
     # Before I parse, I need to disable stuff
     clean = []
-    for s in seqs:
+    #for s in seqs:
+    start = dontre.search(s)
+    while start is not None:
+        start = start.start()
+        end = dore.search(s, start - 1)
+        if end is None:
+            print(f"Removed {s[start:]}")
+            s = s[:start]
+        else:
+            end = end.start()
+            print(f"Removed {s[start:end]}")
+            s = s[:start] + s[end:]
         start = dontre.search(s)
-        while start is not None:
-            start = start.start()
-            end = dore.search(s, start - 1)
-            if end is None:
-                print(f"Removed {s[start:]}")
-                s = s[:start]
-            else:
-                end = end.start()
-                print(f"Removed {s[start:end]}")
-                s = s[:start] + s[end:]
-            start = dontre.search(s)
-        print(f"Clean line: {s}")
-        clean.append("" + s)
-    print(" == CLEAN == ")
-    print(clean)
+    print(f"Clean line: {s}")
+    clean.append("" + s)
 
     # Now we're ready
     return parse(clean)
