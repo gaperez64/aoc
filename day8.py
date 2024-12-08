@@ -2,6 +2,27 @@ import copy
 import sys
 
 
+def findAtns2(plan, i, j, atns):
+    atnSym = plan[i][j]
+    print(f"Adding antinodes for antenna {atnSym} at {i, j}")
+    for k in range(i, len(plan)):
+        for l in range(len(plan[0])):
+            if k == i and l <= j:
+                continue
+            if plan[k][l] == atnSym:
+                diff = (k - i, l - j)
+                p = (i, j)
+                while p[0] >= 0 and p[0] < len(plan) and\
+                        p[1] >= 0 and p[1] < len(plan[0]):
+                    atns[p[0]][p[1]] = '#'
+                    p = (p[0] + diff[0], p[1] + diff[1])
+                p = (i - diff[0], j - diff[1])
+                while p[0] >= 0 and p[0] < len(plan) and\
+                        p[1] >= 0 and p[1] < len(plan[0]):
+                    atns[p[0]][p[1]] = '#'
+                    p = (p[0] - diff[0], p[1] - diff[1])
+
+
 def findAtns(plan, i, j, atns):
     atnSym = plan[i][j]
     print(f"Adding antinodes for antenna {atnSym} at {i, j}")
@@ -19,7 +40,7 @@ def findAtns(plan, i, j, atns):
                         atns[p[0]][p[1]] = '#'
 
 
-def silver(fname):
+def silver(fname, resonance=False):
     plan = []
     with open(fname, "r") as f:
         for line in f:
@@ -32,7 +53,10 @@ def silver(fname):
     for i in range(len(plan)):
         for j in range(len(plan[0])):
             if plan[i][j] != '.':
-                findAtns(plan, i, j, atns)
+                if not resonance:
+                    findAtns(plan, i, j, atns)
+                else:
+                    findAtns2(plan, i, j, atns)
     print("\n".join(map(lambda x: "".join(x), atns)))
 
     atnCnt = map(sum,
@@ -42,7 +66,7 @@ def silver(fname):
 
 
 def gold(fname):
-    pass
+    return silver(fname, resonance=True)
 
 
 if __name__ == "__main__":
